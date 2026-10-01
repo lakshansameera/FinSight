@@ -1,6 +1,7 @@
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import RootNavigator from '@/navigation/RootNavigator';
 import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { 
   useFonts,
@@ -31,12 +32,10 @@ export default function App() {
 
   if (!loaded) return null;
 
-  return (
-    <View style={{ flex: 1, backgroundColor: colors.bg, justifyContent: 'center', padding: 24, gap: 8 }}>
-      <Text style={[type.display, { color: colors.primary }]}>FinSight</Text>
-      <Text style={type.body}>Your money stays useful offline.</Text>
-      <Text style={type.caption}>Theme and fonts loaded</Text>
-      <StatusBar style="dark" />
-    </View>
-  );
+ return (
+  <SafeAreaProvider>
+    <RootNavigator />
+    <StatusBar style="dark" />
+  </SafeAreaProvider>
+);
 }
