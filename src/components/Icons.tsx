@@ -14,6 +14,7 @@ const ICONS = {
   check: { set: 'ion', glyph: 'checkmark' },
   plus: { set: 'ion', glyph: 'add' },
   pencil: { set: 'ion', glyph: 'create-outline' },
+  search: { set: 'ion', glyph: 'search-outline' },
   // status
   clock: { set: 'ion', glyph: 'time-outline' },
   sync: { set: 'ion', glyph: 'sync-outline' },

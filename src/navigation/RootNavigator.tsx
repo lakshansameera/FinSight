@@ -17,6 +17,7 @@ import NotificationsScreen from '@/screens/NotificationsScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
 import GalleryScreen from '@/screens/GalleryScreen';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import DbTestScreen from "@/screens/DbTestScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -54,6 +55,7 @@ export default function RootNavigator() {
                 <Stack.Screen name="Notifications" component={NotificationsScreen} />
                 <Stack.Screen name="Settings" component={SettingsScreen} />
                 <Stack.Screen name="Gallery" component={GalleryScreen} /> 
+                <Stack.Screen name="DbTest" component={DbTestScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );

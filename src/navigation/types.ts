@@ -18,7 +18,8 @@ export type RootStackParamList  = {
   OfferDetail:{ offerId: string}
   Notifications : undefined;
   Settings : undefined;
-   Gallery: undefined;
+  Gallery: undefined;
+  DbTest: undefined;
 };
 
 declare global {

@@ -3,15 +3,21 @@ import RootNavigator from '@/navigation/RootNavigator';
 import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import { 
+import {
   useFonts,
-  Inter_400Regular, 
-  Inter_500Medium, 
-  Inter_600SemiBold, 
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
   Inter_700Bold,
-  Inter_800ExtraBold 
+  Inter_800ExtraBold
 } from '@expo-google-fonts/inter';
 import { colors, type } from '@/constants/theme';
+import { Provider } from 'react-redux';
+import { store } from '@/store';
+import { loadTransactions } from '@/store/transactionsSlice';
+import { loadBudgets } from '@/store/budgetsSlice';
+import { refreshPending } from '@/store/syncSlice';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,18 +30,28 @@ export default function App() {
     Inter_600SemiBold,
     Inter_700Bold,
     Inter_800ExtraBold,
+    ...Ionicons.font,
+    ...MaterialCommunityIcons.font,
   });
 
   useEffect(() => {
     if (loaded) SplashScreen.hideAsync();
   }, [loaded]);
 
-  if (!loaded) return null;
+  useEffect(() => {
+    store.dispatch(loadTransactions());
+    store.dispatch(loadBudgets());
+    store.dispatch(refreshPending());
+  }, []);
 
- return (
-  <SafeAreaProvider>
-    <RootNavigator />
-    <StatusBar style="dark" />
-  </SafeAreaProvider>
-);
+  if (!loaded && !Error) return null;
+
+  return (
+    <Provider store={store}>
+      <SafeAreaProvider>
+        <RootNavigator />
+        <StatusBar style="dark" />
+      </SafeAreaProvider>
+    </Provider>
+  );
 }

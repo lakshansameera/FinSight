@@ -15,7 +15,7 @@ export function BudgetBar({ label, cat, spent, limit }: props) {
     const status = budgetStatus(spent, limit);
     const c = STATUS_COLORS[status];
 
-    const pct = limit > 0 ? Math.min(spent / limit, 1) : 0;
+    const pct = Math.round((limit > 0 ? Math.min(spent / limit, 1) : 0) * 100);
     const fillWidth = Math.min(Math.max(pct, 0), 100);
 
     const note =
