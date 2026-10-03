@@ -6,12 +6,16 @@ import { SyncBadge } from '@/components/SyncBadge';
 import { colors, font, type } from '@/constants/theme';
 import { CategoryIcon } from '@/components/CategoryIcon';
 import { ExpenseItem } from '@/components/ExpenseItem';
+import { BudgetBar } from '@/components/BudgetBar';
+import { BudgetRing } from '@/components/BudgetRing';
+import { AppHeader } from '@/components/AppHeader';
+import { BillCard } from '@/components/BillCard';
+import { OfferCard } from '@/components/OfferCard';
+import { Banner } from '@/components/Banner';
 
-// A developer-only screen that shows every component in every state.
-// Compare it with the boards on the design canvas.
 export default function GalleryScreen() {
     const navigation = useNavigation();
-    const noop = () => { }; // a function that does nothing, for demo buttons
+    const noop = () => { };
 
     return (
         <SafeAreaView style={styles.screen}>
@@ -62,8 +66,44 @@ export default function GalleryScreen() {
                 <ExpenseItem merchant="PickMe" meta="Transport · Today, 08:05" amount={640} cat="transport" direction="out" tag="pending" />
                 <ExpenseItem merchant="Osu Sala" meta="From receipt · confirm category" amount={1850} cat="health" direction="out" tag="draft" />
 
+                <Text style={styles.section}>BUDGET BAR · OK / WARNING / OVER</Text>
+                <BudgetBar label="Food & dining" cat="food" spent={12400} limit={25000} />
+                <BudgetBar label="Transport" cat="transport" spent={8600} limit={10000} />
+                <BudgetBar label="Shopping" cat="shopping" spent={16300} limit={15000} />
+
+                <Text style={styles.section}>BUDGET RING</Text>
+                <View style={styles.row}>
+                    <BudgetRing spent={68200} limit={100000} size={150} />
+                    <BudgetRing spent={91000} limit={100000} size={150} />
+                </View>
+                <BudgetRing spent={104500} limit={100000} size={150} />
+
+
+                <Text style={styles.section}>APP HEADER · HOME / SCREEN</Text>
+                <AppHeader subTitle="Good evening" title="Sameera" syncState="pending" pendingCount={14} unreadCount={17} onBellPress={noop} />
+                <AppHeader title="Budgets" onBack={noop} syncState="synced" />
+                <AppHeader title="Bill details" onBack={noop} unreadCount={0} onBellPress={noop} />
+
+                <Text style={styles.section}>BILL CARD · 4 STATES</Text>
+                <BillCard name="Dialog Fibre" amount={4990} dueText="Due 12 Oct" status="upcoming" onPress={noop} onMarkPaid={noop} />
+                <BillCard name="CEB electricity" amount={6240} dueText="Due in 2 days" status="dueSoon" onPress={noop} onMarkPaid={noop} />
+                <BillCard name="Water board" amount={1820} dueText="3 days overdue" status="overdue" onPress={noop} onMarkPaid={noop} />
+                <BillCard name="House rent" cat="family" amount={45000} dueText="Paid 1 Oct" status="paid" onPress={noop} />
+
+                <Text style={styles.section}>OFFER CARD</Text>
+                <OfferCard bank="Commercial Bank" bankColor="#1F4F8A" title="15% off at Keells Super" detail="Credit cards · until 31 Oct" matched matchText="You spent LKR 18,400 on groceries this month" onPress={noop} />
+                <OfferCard bank="Sampath Bank" bankColor="#C26A3A" title="0% instalments on electronics" detail="Up to 24 months · until 15 Nov" onPress={noop} />
+
+                <Text style={styles.section}>BANNER · 4 TONES</Text>
+                <Banner tone="info" title="You're offline" message="Changes are saved on this phone and will sync later." />
+                <Banner tone="success" title="All caught up" message="12 transactions synced to the cloud." onDismiss={noop} />
+                <Banner tone="warning" title="Transport budget at 86%" message="LKR 1,400 left for the next 9 days." actionLabel="View budget" onAction={noop} />
+                <Banner tone="danger" title="Sync failed" message="We'll retry automatically." actionLabel="Retry now" onAction={noop} onDismiss={noop} />
+
                 <Text style={styles.section}>NAVIGATION</Text>
                 <Button title="Back" variant="outline" icon="back" onPress={() => navigation.goBack()} />
+
+
             </ScrollView>
         </SafeAreaView>
     );

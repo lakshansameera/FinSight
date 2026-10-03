@@ -5,7 +5,7 @@ import { font } from '@/constants/theme';
 // The four states from section 4 of the project document
 export type SyncState = 'synced' | 'pending' | 'syncing' | 'offline';
 
-// What each state looks like
+
 const STATES: Record<SyncState, { bg: string; fg: string; icon: IconName }> = {
   synced: { bg: '#DDF2E8', fg: '#0B5238', icon: 'check' },
   pending: { bg: '#FFF1D6', fg: '#8A5200', icon: 'clock' },
@@ -15,11 +15,11 @@ const STATES: Record<SyncState, { bg: string; fg: string; icon: IconName }> = {
 
 type Props = {
   state: SyncState;
-  pendingCount?: number; // only used when state is 'pending'
+  pendingCount?: number; 
   onPress?: () => void;
 };
 
-// Builds the text for a state, e.g. "3 pending"
+
 function labelFor(state: SyncState, pendingCount: number) {
   switch (state) {
     case 'synced':
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start', // shrink to fit the text, don't stretch full width
+    alignSelf: 'flex-start', 
     gap: 6,
     height: 32,
     paddingHorizontal: 12,
