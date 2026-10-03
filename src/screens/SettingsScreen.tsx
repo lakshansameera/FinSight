@@ -1,5 +1,5 @@
-import { PlaceHolderScreen } from '@/components/PlaceholderScreen';
+import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 
 export default function SettingsScreen() {
-  return <PlaceHolderScreen title="Settings" />;
+  return <PlaceholderScreen title="Settings" />;
 }

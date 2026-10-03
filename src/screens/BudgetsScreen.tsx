@@ -1,5 +1,5 @@
-import { PlaceHolderScreen } from '@/components/PlaceholderScreen';
+import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 
 export default function BudgetsScreen() {
-  return <PlaceHolderScreen title="Budgets" />;
+  return <PlaceholderScreen title="Budgets" />;
 }

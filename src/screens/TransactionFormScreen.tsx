@@ -1,5 +1,5 @@
-import { PlaceHolderScreen } from '@/components/PlaceholderScreen';
+import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 
 export default function TransactionFormScreen() {
-  return <PlaceHolderScreen title="Add transaction" />;
+  return <PlaceholderScreen title="Add transaction" />;
 }

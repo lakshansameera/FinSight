@@ -15,10 +15,10 @@ const TABS: Record<string, { label: string; icon: IconName }> = {
 };
 
 export function NavBar({ state, navigation }: BottomTabBarProps) {
-    const inserts = useSafeAreaInsets();
+    const insets = useSafeAreaInsets();
 
     return (
-        <View style={[styles.bar, { paddingBottom: inserts.bottom }]}>
+        <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
             {state.routes.map((route, index) => {
                 const isFocused = state.index === index;
                 const tab = TABS[route.name];
@@ -45,8 +45,9 @@ export function NavBar({ state, navigation }: BottomTabBarProps) {
                             accessibilityLabel="Scan receipt"
                         >
                             <View style={styles.scanButton}>
-                                <Icon name="scan" color="#FFFFFF" size={26} />
+                                <Icon name="scan" size={26} color="#FFFFFF" />
                             </View>
+                            <Text style={[styles.label, isFocused && styles.labelActive]}>Scan</Text>
 
                         </Pressable>
                     );

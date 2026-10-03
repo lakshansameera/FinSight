@@ -29,6 +29,8 @@ const ICONS = {
   health: { set: 'ion', glyph: 'heart-outline' },
   other: { set: 'ion', glyph: 'grid-outline' },
   income: { set: 'ion', glyph: 'arrow-down-outline' },
+  loans: { set: 'mci', glyph: 'hand-coin-outline' },
+  family: { set: 'ion', glyph: 'people-outline' },
 } as const;
 
 export type IconName = keyof typeof ICONS;

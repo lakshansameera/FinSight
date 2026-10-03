@@ -1,5 +1,5 @@
-import { PlaceHolderScreen } from '@/components/PlaceholderScreen';
+import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 
 export default function NotificationsScreen() {
-  return <PlaceHolderScreen title="Notifications" />;
+  return <PlaceholderScreen title="Notifications" />;
 }

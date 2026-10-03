@@ -1,14 +1,16 @@
-import { Pressable , StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import { Icon, type IconName } from './Icons';
-import { colors, font } from '@/constants/theme';
+import { font } from '@/constants/theme';
 
-export type SyncState = 'synced' | 'syncing' | 'offline';
+// The four states from section 4 of the project document
+export type SyncState = 'synced' | 'pending' | 'syncing' | 'offline';
 
-const STATES : Record<SyncState, { bg: string; fg: string ; color: IconName }> = {
-    synced: { bg: '#DDF2E8', fg: '#0B5238', icon: 'check' },
-    pending: { bg: '#FFF1D6', fg: '#8A5200', icon: 'clock' },
-    syncing: { bg: '#E4EDFA', fg: '#1F4F8A', icon: 'sync' },
-offline: { bg: '#FBE5E3', fg: '#9A2F2B', icon: 'offline' },
+// What each state looks like
+const STATES: Record<SyncState, { bg: string; fg: string; icon: IconName }> = {
+  synced: { bg: '#DDF2E8', fg: '#0B5238', icon: 'check' },
+  pending: { bg: '#FFF1D6', fg: '#8A5200', icon: 'clock' },
+  syncing: { bg: '#E4EDFA', fg: '#1F4F8A', icon: 'sync' },
+  offline: { bg: '#FBE5E3', fg: '#9A2F2B', icon: 'offline' },
 };
 
 type Props = {
@@ -17,6 +19,7 @@ type Props = {
   onPress?: () => void;
 };
 
+// Builds the text for a state, e.g. "3 pending"
 function labelFor(state: SyncState, pendingCount: number) {
   switch (state) {
     case 'synced':
@@ -30,8 +33,7 @@ function labelFor(state: SyncState, pendingCount: number) {
   }
 }
 
-
-export function SyncBadge({ state, pendingCount = 0, onPress }: Props) {
+export function SyncBadge({ state, pendingCount = 0, onPress }: Readonly<Props>) {
   const s = STATES[state];
   const label = labelFor(state, pendingCount);
 

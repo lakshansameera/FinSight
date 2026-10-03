@@ -1,5 +1,5 @@
-import { PlaceHolderScreen } from '@/components/PlaceholderScreen';
+import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 
 export default function SmsReviewScreen() {
-  return <PlaceHolderScreen title="SMS review" />;
+  return <PlaceholderScreen title="SMS review" />;
 }
