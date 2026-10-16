@@ -6,10 +6,11 @@ import bills from './billsSlice';
 
 export const store = configureStore({
   reducer: {
-    transactions,
-    budgets,
-    sync,
-  },
+  transactions,
+  budgets,
+  sync,
+  bills,
+},
 });
 
 export type RootState = ReturnType<typeof store.getState>;
