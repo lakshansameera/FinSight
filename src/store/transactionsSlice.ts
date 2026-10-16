@@ -1,66 +1,83 @@
-import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { countPending } from '@/db/transactionsRepo';
-import type { SyncState } from '@/components/SyncBadge';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import {
+  addTransaction,
+  deleteTransaction,
+  listTransactions,
+  updateTransaction,
+  type NewTransaction,
+  type Transaction,
+} from '@/db/transactionsRepo';
+import { loadBudgets } from './budgetsSlice';
+import { refreshPending } from './syncSlice';
 
-type SyncSliceState = {
-  pendingCount: number; // changes waiting in the queue
-  online: boolean; // false when the phone has no connection
-  syncing: boolean; // a sync pass is running
-  lastError: string | null;
-  lastSyncedAt: string | null;
-  status: SyncState; // what the badge shows
+type TransactionsState = {
+  items: Transaction[]; // newest first
+  status: 'idle' | 'loading' | 'ready' | 'error';
+  error: string | null;
 };
 
-const initialState: SyncSliceState = {
-  pendingCount: 0,
-  online: true,
-  syncing: false,
-  lastError: null,
-  lastSyncedAt: null,
-  status: 'synced',
-};
+const initialState: TransactionsState = { items: [], status: 'idle', error: null };
 
-export const refreshPending = createAsyncThunk('sync/refreshPending', async () => {
-  return countPending();
+export const loadTransactions = createAsyncThunk('transactions/load', async () => {
+  return listTransactions(200);
 });
 
-/** One place decides the badge, so every screen agrees. */
-function recompute(s: SyncSliceState) {
-  if (s.syncing) s.status = 'syncing';
-  else if (!s.online) s.status = 'offline';
-  else s.status = s.pendingCount > 0 ? 'pending' : 'synced';
-}
+export const createTransaction = createAsyncThunk(
+  'transactions/create',
+  async (input: NewTransaction, { dispatch }) => {
+    const tx = await addTransaction(input);
+    dispatch(loadBudgets());
+    dispatch(refreshPending());
+    return tx;
+  },
+);
 
-const syncSlice = createSlice({
-  name: 'sync',
+export const editTransaction = createAsyncThunk(
+  'transactions/edit',
+  async (args: { id: string; changes: Partial<Omit<NewTransaction, 'source'>> }, { dispatch }) => {
+    const tx = await updateTransaction(args.id, args.changes);
+    dispatch(loadBudgets());
+    dispatch(refreshPending());
+    return tx;
+  },
+);
+
+export const removeTransaction = createAsyncThunk('transactions/remove', async (id: string, { dispatch }) => {
+  await deleteTransaction(id);
+  dispatch(loadBudgets());
+  dispatch(refreshPending());
+  return id;
+});
+
+const transactionsSlice = createSlice({
+  name: 'transactions',
   initialState,
-  reducers: {
-    setOnline(state, action: PayloadAction<boolean>) {
-      state.online = action.payload;
-      recompute(state);
-    },
-    syncStarted(state) {
-      state.syncing = true;
-      recompute(state);
-    },
-    syncFinished(state, action: PayloadAction<{ error: string | null; offline?: boolean }>) {
-      state.syncing = false;
-      state.lastError = action.payload.error;
-      if (action.payload.offline) state.online = false;
-      if (!action.payload.error) {
-        state.online = true;
-        state.lastSyncedAt = new Date().toISOString();
-      }
-      recompute(state);
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(refreshPending.fulfilled, (state, action) => {
-      state.pendingCount = action.payload;
-      recompute(state);
-    });
+    builder
+      .addCase(loadTransactions.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(loadTransactions.fulfilled, (state, action) => {
+        state.items = action.payload;
+        state.status = 'ready';
+      })
+      .addCase(loadTransactions.rejected, (state, action) => {
+        state.status = 'error';
+        state.error = action.error.message ?? 'Failed to load transactions';
+      })
+      .addCase(createTransaction.fulfilled, (state, action) => {
+        state.items.unshift(action.payload);
+      })
+      .addCase(editTransaction.fulfilled, (state, action) => {
+        const i = state.items.findIndex((t) => t.id === action.payload.id);
+        if (i >= 0) state.items[i] = action.payload;
+      })
+      .addCase(removeTransaction.fulfilled, (state, action) => {
+        state.items = state.items.filter((t) => t.id !== action.payload);
+      });
   },
 });
 
-export const { setOnline, syncStarted, syncFinished } = syncSlice.actions;
-export default syncSlice.reducer;
+export default transactionsSlice.reducer;

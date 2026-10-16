@@ -22,9 +22,6 @@ import { loadBills } from '@/store/billsSlice';
 import { bootstrapAuth } from '@/store/authSlice';
 import { SyncManager } from '@/components/SyncManager';
 
-store.dispatch(loadBills());
-
-
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
