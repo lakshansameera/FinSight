@@ -1,7 +1,7 @@
 import { createAsyncThunk , createSlice } from "@reduxjs/toolkit";
-import { listBudgetsWithSpent, setBudget, type BudgetWithSpent } from "@/db/budgetsRepo";
+import { deleteBudget, listBudgetsWithSpent, setBudget, type BudgetWithSpent } from '@/db/budgetsRepo';
 import { refreshPending } from "./syncSlice";
-import type { CategoryKey }from '@/constants/theme';
+import type { CategoryKey } from '@/constants/theme';
 
 type BudgetsState = {
     items : BudgetWithSpent [];
@@ -45,5 +45,10 @@ const budgetsSlice = createSlice({
   },
 });
 
+export const removeBudget = createAsyncThunk('budgets/remove', async (id: string, { dispatch }) => {
+  await deleteBudget(id);
+  await dispatch(loadBudgets());
+  await dispatch(refreshPending());
+});
 
 export default budgetsSlice.reducer;

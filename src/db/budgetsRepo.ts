@@ -8,10 +8,10 @@ export type BudgetWithSpent = {
   id: string;
   category: CategoryKey;
   limitCents: number;
-  spentCents: number; // this month's spending in that category
+  spentCents: number; 
 };
 
-// Create or change the budget for a category. "Upsert" = insert, or update if it exists.
+
 export async function setBudget(category: CategoryKey, limitCents: number): Promise<void> {
   const db = await getDb();
   const now = new Date().toISOString();
@@ -34,7 +34,7 @@ export async function setBudget(category: CategoryKey, limitCents: number): Prom
   });
 }
 
-// Every budget, with how much was spent this month — in ONE query.
+
 export async function listBudgetsWithSpent(date = new Date()): Promise<BudgetWithSpent[]> {
   const db = await getDb();
   const { start, end } = monthRange(date);
@@ -60,4 +60,18 @@ export async function listBudgetsWithSpent(date = new Date()): Promise<BudgetWit
     limitCents: r.limit_cents,
     spentCents: r.spent_cents,
   }));
+}
+
+
+export async function deleteBudget(id: string): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+  await db.withExclusiveTransactionAsync(async (txn) => {
+    const res = await txn.runAsync(
+      `UPDATE budgets SET deleted = 1, updated_at = ?, sync_status = 'pending' WHERE id = ? AND deleted = 0`,
+      [now, id],
+    );
+    if (res.changes === 0) return;
+    await enqueue(txn, 'budget', id, 'delete', { id, updatedAt: now });
+  });
 }

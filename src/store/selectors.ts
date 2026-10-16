@@ -18,3 +18,23 @@ export const selectMonthTotals = createSelector([selectTransactions], (items) =>
   }
   return { spentCents, incomeCents };
 });
+
+
+export const selectRecent = createSelector([selectTransactions], (items) => items.slice(0, 5));
+
+export const selectBudgetSummary = createSelector([selectBudgets], (budgets) => {
+  let limitCents = 0;
+  let spentCents = 0;
+  for (const b of budgets) {
+    limitCents += b.limitCents;
+    spentCents += b.spentCents;
+  }
+  return { limitCents, spentCents, count: budgets.length };
+});
+
+export const selectBudgetAlert = createSelector([selectBudgets], (budgets) => {
+  const top = budgets[0];
+  if (!top) return null;
+  const ratio = top.spentCents / top.limitCents;
+  return ratio >= 0.8 ? { ...top, ratio } : null;
+});

@@ -19,7 +19,6 @@ export type RootStackParamList  = {
   Notifications : undefined;
   Settings : undefined;
   Gallery: undefined;
-  DbTest: undefined;
 };
 
 declare global {
