@@ -17,6 +17,10 @@ import NotificationsScreen from '@/screens/NotificationsScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
 import GalleryScreen from '@/screens/GalleryScreen';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import OnboardingScreen from '@/screens/OnboardingScreen';
+import LoginScreen from '@/screens/LoginScreen';
+import { SplashView } from '@/components/SplashView';
+import { useAppSelector } from '@/store/hooks';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -41,21 +45,33 @@ function Tabs() {
 }
 
 export default function RootNavigator() {
+    const status = useAppSelector((s) => s.auth.status);
+
+    if (status === 'loading') return <SplashView />;
+
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
-                <Stack.Screen name="Tabs" component={Tabs} />
-                <Stack.Screen name="TransactionForm" component={TransactionFormScreen} />
-                <Stack.Screen name="Budgets" component={BudgetsScreen} />
-                <Stack.Screen name="Bills" component={BillsScreen} />
-                <Stack.Screen name="BillDetail" component={BillDetailScreen} />
-                <Stack.Screen name="SmsReview" component={SmsReviewScreen} />
-                <Stack.Screen name="OfferDetail" component={OfferDetailScreen} />
-                <Stack.Screen name="Notifications" component={NotificationsScreen} />
-                <Stack.Screen name="Settings" component={SettingsScreen} />
-                <Stack.Screen name="Gallery" component={GalleryScreen} /> 
-
+                {status === 'onboarding' ? (
+                    <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+                ) : status === 'signedOut' ? (
+                    <Stack.Screen name="Login" component={LoginScreen} />
+                ) : (
+                    <>
+                        <Stack.Screen name="Tabs" component={Tabs} />
+                        <Stack.Screen name="TransactionForm" component={TransactionFormScreen} />
+                        <Stack.Screen name="Budgets" component={BudgetsScreen} />
+                        <Stack.Screen name="Bills" component={BillsScreen} />
+                        <Stack.Screen name="BillDetail" component={BillDetailScreen} />
+                        <Stack.Screen name="SmsReview" component={SmsReviewScreen} />
+                        <Stack.Screen name="OfferDetail" component={OfferDetailScreen} />
+                        <Stack.Screen name="Notifications" component={NotificationsScreen} />
+                        <Stack.Screen name="Settings" component={SettingsScreen} />
+                        <Stack.Screen name="Gallery" component={GalleryScreen} />
+                    </>
+                )}
             </Stack.Navigator>
         </NavigationContainer>
     );
 }
+

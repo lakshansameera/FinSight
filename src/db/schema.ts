@@ -51,5 +51,12 @@ export const MIGRATIONS: string[] = [
     sync_status        TEXT NOT NULL DEFAULT 'pending' CHECK (sync_status IN ('pending', 'synced'))
   );
   `,
-  // ---------- version 3 goes here when you need it ----------
+    // ---------- version 3 ----------
+  `
+  CREATE TABLE IF NOT EXISTS kv (
+    key   TEXT PRIMARY KEY NOT NULL,
+    value TEXT NOT NULL
+  );
+  `,
+  // ---------- version 4 goes here when you need it ----------
 ];

@@ -19,6 +19,8 @@ export type RootStackParamList  = {
   Notifications : undefined;
   Settings : undefined;
   Gallery: undefined;
+  Onboarding: undefined;
+  Login: undefined;
 };
 
 declare global {

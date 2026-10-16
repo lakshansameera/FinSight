@@ -14,6 +14,10 @@ import { loadBudgets } from '@/store/budgetsSlice';
 import { loadBills } from '@/store/billsSlice';
 import { refreshPending } from '@/store/syncSlice';
 import { syncBillReminders } from '@/utils/reminders';
+import { resetSyncState } from '@/db/syncRepo';
+import { isFirebaseConfigured } from '@/config/firebase';
+import { authResolved, signOutUser } from '@/store/authSlice';
+import { runSync } from '@/store/syncThunks';
 
 function Row({ label, value }: Readonly<{ label: string; value: string }>) {
   return (
@@ -29,6 +33,7 @@ export default function SettingsScreen() {
   const dispatch = useAppDispatch();
   const sync = useAppSelector(selectSync);
   const bills = useAppSelector(selectBills);
+  const auth = useAppSelector((st) => st.auth);
   const [counts, setCounts] = useState({ transactions: 0, budgets: 0, bills: 0 });
   const [reminderMsg, setReminderMsg] = useState<string | null>(null);
 
@@ -54,6 +59,8 @@ export default function SettingsScreen() {
         style: 'destructive',
         onPress: async () => {
           await clearAllData();
+          await resetSyncState();
+          dispatch(runSync());
           await Promise.all([
             dispatch(loadTransactions()),
             dispatch(loadBudgets()),
@@ -66,18 +73,65 @@ export default function SettingsScreen() {
     ]);
   }
 
+    function onSignOut() {
+    Alert.alert('Sign out?', "Your data stays safe in the cloud. This phone's copy is removed and comes back when you sign in again.", [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Sign out',
+        style: 'destructive',
+        onPress: async () => {
+          const res = await dispatch(signOutUser());
+          if (signOutUser.rejected.match(res)) Alert.alert('Could not sign out', String(res.payload ?? 'Try again'));
+        },
+      },
+    ]);
+  }
+
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
         <AppHeader title="Settings" onBack={() => navigation.goBack()} />
 
         <Text style={styles.section}>Sync</Text>
+                <Text style={styles.section}>Account & sync</Text>
         <View style={styles.card}>
-          <Row label="Status" value={sync.status === 'synced' ? 'Up to date' : `${sync.pendingCount} change${sync.pendingCount === 1 ? '' : 's'} waiting`} />
-          <Row label="Storage" value="On this phone (works offline)" />
-        </View>
-        <Banner tone="info" title="Offline first" message="Everything you add is saved on this phone first and queued for upload. The cloud backend is the next step." />
+          <Row
+            label="Account"
+            value={auth.status === 'signedIn' ? (auth.email ?? 'Signed in') : isFirebaseConfigured ? 'Not signed in' : 'Cloud not set up'}
+          />
+          <Row
+            label="Status"
+            value={
+              sync.status === 'synced'
+                ? 'Up to date'
+                : sync.status === 'syncing'
+                  ? 'Syncing…'
+                  : sync.status === 'offline'
+                    ? 'Offline'
+                    : `${sync.pendingCount} change${sync.pendingCount === 1 ? '' : 's'} waiting`
+            }
+          />
+          {sync.lastSyncedAt ? <Row label="Last synced" value={new Date(sync.lastSyncedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })} /> : null}
+          {sync.lastError && sync.status !== 'synced' ? <Text style={styles.msg}>Last problem: {sync.lastError}</Text> : null}
 
+          {auth.status === 'signedIn' ? (
+            <>
+              <Button title="Sync now" variant="tonal" size="md" icon="sync" loading={sync.syncing} onPress={() => dispatch(runSync())} />
+              <Button title="Sign out" variant="outline" size="md" loading={auth.busy} onPress={onSignOut} />
+            </>
+          ) : isFirebaseConfigured ? (
+            <Button title="Sign in to back up" variant="tonal" size="md" onPress={() => dispatch(authResolved({ status: 'signedOut' }))} />
+          ) : null}
+        </View>
+        <Banner
+          tone="info"
+          title="Offline first"
+          message={
+            isFirebaseConfigured
+              ? 'Everything is saved on this phone first and uploaded when you are online.'
+              : 'Cloud backup is not set up in this build, so your data stays on this phone.'
+          }
+        />
         <Text style={styles.section}>Reminders</Text>
         <View style={styles.card}>
           <Row label="Bills tracked" value={String(counts.bills)} />

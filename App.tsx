@@ -19,6 +19,9 @@ import { loadBudgets } from '@/store/budgetsSlice';
 import { refreshPending } from '@/store/syncSlice';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { loadBills } from '@/store/billsSlice';
+import { bootstrapAuth } from '@/store/authSlice';
+import { SyncManager } from '@/components/SyncManager';
+
 store.dispatch(loadBills());
 
 
@@ -41,10 +44,12 @@ export default function App() {
     if (loaded) SplashScreen.hideAsync();
   }, [loaded]);
 
-  useEffect(() => {
+    useEffect(() => {
     store.dispatch(loadTransactions());
     store.dispatch(loadBudgets());
+    store.dispatch(loadBills());
     store.dispatch(refreshPending());
+    store.dispatch(bootstrapAuth());
   }, []);
 
   if (!loaded) return null;
@@ -53,6 +58,7 @@ export default function App() {
     <Provider store={store}>
       <SafeAreaProvider>
         <RootNavigator />
+        <SyncManager />
         <StatusBar style="dark" />
       </SafeAreaProvider>
     </Provider>
