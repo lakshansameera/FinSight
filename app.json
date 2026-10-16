@@ -24,7 +24,14 @@
     "plugins": [
       "expo-font",
       "expo-splash-screen",
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-notifications",
+      ["expo-image-picker", 
+        { 
+          "cameraPermission": 
+          "FinSight uses the camera to photograph receipts." 
+          }
+        ]
     ]
   }
 }

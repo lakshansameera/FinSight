@@ -24,6 +24,10 @@ import { loadBudgets } from '@/store/budgetsSlice';
 import { refreshPending } from '@/store/syncSlice';
 import { formatLKR } from '@/utils/currency';
 import { dayLabel, greeting, timeLabel } from '@/utils/dates';
+import { BillCard } from '@/components/BillCard';
+import { selectBillsSummary, selectBillsWithStatus, selectNotifications } from '@/store/selectors';
+import { loadBills, payBill } from '@/store/billsSlice';
+import { dueText } from '@/utils/bills';
 
 function SectionTitle({ title, onSeeAll }: Readonly<{ title: string; onSeeAll?: () => void }>) {
     return (
@@ -50,6 +54,10 @@ export default function HomeScreen() {
     const budgets = useAppSelector(selectBudgets);
     const alert = useAppSelector(selectBudgetAlert);
     const recent = useAppSelector(selectRecent);
+    const bills = useAppSelector(selectBillsWithStatus);
+    const billsSummary = useAppSelector(selectBillsSummary);
+    const notifications = useAppSelector(selectNotifications);
+
 
     const [refreshing, setRefreshing] = useState(false);
     const onRefresh = useCallback(async () => {
@@ -148,7 +156,28 @@ export default function HomeScreen() {
                     ))
                 )}
 
-                <SectionTitle title="Developer" />
+                <SectionTitle title="Upcoming bills" onSeeAll={() => navigation.navigate('Bills')} />
+                {billsSummary.count === 0 ? (
+                    <Text style={styles.empty}>No bills yet. Add rent or electricity to get reminders.</Text>
+                ) : (
+                    bills.filter((b) => b.status !== 'paid').slice(0, 2).map(({ bill, status, daysLeft, dueDate }) => (
+                        <BillCard
+                            key={bill.id}
+                            name={bill.name}
+                            cat={bill.category}
+                            amount={bill.amountCents / 100}
+                            status={status}
+                            dueText={dueText(status, daysLeft, dueDate)}
+                            onPress={() => navigation.navigate('BillDetail', { billId: bill.id })}
+                            onMarkPaid={() => dispatch(payBill(bill.id))}
+                        />
+                    ))
+                )}
+                <View style={styles.devRow}>
+                    <Button title="Bills" variant="outline" size="sm" onPress={() => navigation.navigate('Bills')} />
+                    <Button title="Budgets" variant="outline" size="sm" onPress={goBudgets} />
+                    <Button title="Settings" variant="outline" size="sm" onPress={() => navigation.navigate('Settings')} />
+                </View>
                 <View style={styles.devRow}>
                     <Button title="Gallery" variant="outline" size="sm" onPress={() => navigation.navigate('Gallery')} />
                     <Button title="Bills" variant="outline" size="sm" onPress={() => navigation.navigate('Bills')} />

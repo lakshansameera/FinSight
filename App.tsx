@@ -18,6 +18,9 @@ import { loadTransactions } from '@/store/transactionsSlice';
 import { loadBudgets } from '@/store/budgetsSlice';
 import { refreshPending } from '@/store/syncSlice';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { loadBills } from '@/store/billsSlice';
+store.dispatch(loadBills());
+
 
 SplashScreen.preventAutoHideAsync();
 
@@ -44,7 +47,7 @@ export default function App() {
     store.dispatch(refreshPending());
   }, []);
 
-  if (!loaded && !Error) return null;
+  if (!loaded) return null;
 
   return (
     <Provider store={store}>
